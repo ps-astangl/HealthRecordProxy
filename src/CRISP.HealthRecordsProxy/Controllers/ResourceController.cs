@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CRISP.HealthRecordProxy.Services;
-using CRISP.HealthRecordsProxy.Common.DomainModels;
+using CRISP.Providers.Models.Observation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -28,8 +28,8 @@ namespace CRISP.HealthRecordProxy.Controllers
         public async Task<IActionResult> Test()
         {
             var resources = await _resourceClient
-                .GetResources<ObservationOverviewModel>("Observation",
-                    new List<string> {"b588f32c-b9c8-eb6f-a0db-6a167808bbd1"});
+                .GetResources<ObservationReportFhirModel>("Observation",
+                    new List<string> {"BAC0482A-379D-5CB3-E24F-5BF930324840"});
             return Ok(resources);
         }
     }

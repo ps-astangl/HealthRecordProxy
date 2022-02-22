@@ -1,4 +1,8 @@
+using CRISP.Fhir.Models;
 using CRISP.HealthRecordProxy.Extensions;
+using CRISP.Providers.Models.ImagingStudy;
+using CRISP.Providers.Models.Observation;
+using CRISP.Providers.Models.Specimen;
 using CRISP.Telemetry.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,6 +25,9 @@ namespace CRISP.HealthRecordProxy
         {
             services.AddMvc(options => { options.EnableEndpointRouting = false; });
             services.AddResourceService(_configuration);
+            EntryJsonConverter.AddOrUpdateMapping<ObservationReportFhirModel>("Observation");
+            EntryJsonConverter.AddOrUpdateMapping<SpecimenFhirModel>("Specimen");
+            EntryJsonConverter.AddOrUpdateMapping<ImagingStudyFHIRModel>("ImagingStudy");
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

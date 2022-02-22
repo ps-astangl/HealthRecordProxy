@@ -3,7 +3,10 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
-
+    <!--Need for some odd reason...-->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1.0" />
+    </ItemGroup>
     <ItemGroup>
         <PackageReference Include="CRISP.Providers.ImagingStudy" Version="3.0.0" />
         <PackageReference Include="CRISP.Providers.Observation" Version="3.0.0" />

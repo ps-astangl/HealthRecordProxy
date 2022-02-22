@@ -22,17 +22,14 @@ namespace CRISP.HealthRecordProxy.Services
             _logger = logger;
         }
 
-        public async Task<T> GetResources<T>(string resourceName, List<string> logicalIds) where T : new()
+        public async Task<IEnumerable<T>> GetResources<T>(string resourceName, List<string> logicalIds)
         {
-            var identifiers = logicalIds.StringJoin(',');
-            var encodedIdentifier = HttpUtility.UrlEncode(identifiers);
-            var bundleResult = await ExecuteFhirRequest(logicalIds, resourceName);
-            return await Task.FromResult<T>(new T());
+            return await ExecuteFhirRequest<T>(logicalIds, resourceName);
         }
 
         private HttpClient CreateClient(string resourceName) => _httpClientFactory.CreateClient(resourceName);
 
-        private async Task<Bundle> ExecuteFhirRequest<TId>(IList<TId> ids, string resourceName)
+        private async Task<IEnumerable<TOut>> ExecuteFhirRequest<TOut>(IList<string> ids, string resourceName)
         {
             var client = CreateClient(resourceName);
             var query = "?" + string.Join("&", ids.Select(id => $"_id={id}"));
@@ -42,13 +39,13 @@ namespace CRISP.HealthRecordProxy.Services
             var response = await client.SendAsync(request);
             var body = await response.Content.ReadAsStringAsync();
             var bundle = JsonConvert.DeserializeObject<Bundle>(body);
-            return bundle;
+            return bundle.Entry.Where(x => x.BaseEntryResource is TOut).Select(x => x.BaseEntryResource).Cast<TOut>();
         }
     }
 
 
     public interface IResourceClient
     {
-        public Task<T> GetResources<T>(string resourceName, List<string> logicalIds) where T : new();
+        public Task<IEnumerable<T>> GetResources<T>(string resourceName, List<string> logicalIds);
     }
 }
