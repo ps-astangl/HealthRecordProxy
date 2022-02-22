@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRISP.HealthRecordProxy", "src\CRISP.HealthRecordsProxy\CRISP.HealthRecordProxy.csproj", "{C0A4D3B1-6D1C-47F1-8127-0DD39C0DA93E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRISP.HealthRecordsProxy.Common", "src\CRISP.HealthRecordsProxy.Common\CRISP.HealthRecordsProxy.Common.csproj", "{D2587F0A-D784-4039-B64B-12AA0F0E0E94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{C0A4D3B1-6D1C-47F1-8127-0DD39C0DA93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0A4D3B1-6D1C-47F1-8127-0DD39C0DA93E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0A4D3B1-6D1C-47F1-8127-0DD39C0DA93E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2587F0A-D784-4039-B64B-12AA0F0E0E94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2587F0A-D784-4039-B64B-12AA0F0E0E94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2587F0A-D784-4039-B64B-12AA0F0E0E94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2587F0A-D784-4039-B64B-12AA0F0E0E94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
