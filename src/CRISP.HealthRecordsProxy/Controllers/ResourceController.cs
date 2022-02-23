@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.APIModels;
-using CRISP.Providers.Models.Observation;
+using CRISP.HealthRecordsProxy.Common.DomainModels;
+using CRISP.Providers.Models.ImagingStudy;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,19 @@ namespace CRISP.HealthRecordProxy.Controllers
             [FromBody] IEnumerable<HealthRecordsRequest> healthRecordsRequest)
         {
             var resources = await _resourceService.GetResources(healthRecordsRequest);
-            var stringResult = JsonConvert.SerializeObject(resources);
+
+            var observations = resources.Where(x => x is ObservationOverviewModel);
+            var specimens = resources.Where(x => x is SpecimenOverviewModel);
+            var imagingstudy = resources.Where(x => (x is ImagingStudyOverviewModel));
+
+            HealthRecordsResponse healthRecordsResponse = new HealthRecordsResponse
+            {
+                Specimens = specimens,
+                Observations =  observations,
+                ImagingStudy = imagingstudy
+            };
+
+            var stringResult = JsonConvert.SerializeObject(healthRecordsResponse);
             return new ContentResult
             {
                 ContentType = "Application/json",
@@ -42,9 +55,53 @@ namespace CRISP.HealthRecordProxy.Controllers
         }
 
         [HttpGet, Route("[action]")]
+        public async Task<ActionResult> GetAllRequest()
+        {
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            HealthRecordsRequest observationRequest = ObservationHealthRecordsRequest();
+            HealthRecordsRequest specimenRequest = SpecimenHealthRecordsRequest();
+            HealthRecordsRequest imagingStudyRequest = ImagingStudyHealthRecordsRequest();
+            healthRecordsRequests.Add(observationRequest);
+            healthRecordsRequests.Add(specimenRequest);
+            healthRecordsRequests.Add(imagingStudyRequest);
+
+            return await CallForResources(healthRecordsRequests);
+        }
+
+        [HttpGet, Route("[action]")]
         public async Task<ActionResult> GetObservationRequest()
         {
             List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            var healthRecordsRequest = ObservationHealthRecordsRequest();
+            healthRecordsRequests.Add(healthRecordsRequest);
+            return await CallForResources(healthRecordsRequests);
+        }
+
+
+
+        [HttpGet, Route("[action]")]
+        public async Task<ActionResult> GetSpecimenRequest()
+        {
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            var healthRecordsRequest = SpecimenHealthRecordsRequest();
+            healthRecordsRequests.Add(healthRecordsRequest);
+            return await CallForResources(healthRecordsRequests);
+        }
+
+
+
+        [HttpGet, Route("[action]")]
+        public async Task<ActionResult> GetImagingStudyRequest()
+        {
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            var healthRecordsRequest = ImagingStudyHealthRecordsRequest();
+            healthRecordsRequests.Add(healthRecordsRequest);
+            return await CallForResources(healthRecordsRequests);
+        }
+
+        #region ExampleRequestObjects
+        private static HealthRecordsRequest ObservationHealthRecordsRequest()
+        {
             HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
             {
                 ResourceType = nameof(Observation),
@@ -62,14 +119,10 @@ namespace CRISP.HealthRecordProxy.Controllers
                     "F20005DB-3C5D-817A-6AFE-3DE73488EE9E"
                 }
             };
-            healthRecordsRequests.Add(healthRecordsRequest);
-            return await CallForResources(healthRecordsRequests);
+            return healthRecordsRequest;
         }
-
-        [HttpGet, Route("[action]")]
-        public async Task<ActionResult> GetSpecimenRequest()
+        private static HealthRecordsRequest SpecimenHealthRecordsRequest()
         {
-            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
             {
                 ResourceType = nameof(Specimen),
@@ -87,31 +140,28 @@ namespace CRISP.HealthRecordProxy.Controllers
                     "E4A6A8C4-E7C1-D5FC-B231-4507BA3A193F"
                 }
             };
-            healthRecordsRequests.Add(healthRecordsRequest);
-            return await CallForResources(healthRecordsRequests);
+            return healthRecordsRequest;
         }
-
-        [HttpGet, Route("[action]")]
-        public async Task<ActionResult> GetImagingStudyRequest()
+        private static HealthRecordsRequest ImagingStudyHealthRecordsRequest()
         {
-            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
             {
                 ResourceType = nameof(ImagingStudy),
-                LogicalIdentifier = new string[] {
-                "F1E7CDB4-B48C-A858-C4CD-0906A6DD7929",
-                "466FAD63-FAF0-E42F-ACFA-2B1C5D9C272D",
-                "D45174E0-0E58-EE54-BE84-33C855425358",
-                "418C3FA6-427C-B2C5-B1A1-59F38F482C67",
-                "5F495B98-C896-A848-9C57-6B862C89EF7E",
-                "BAE3627B-1E5F-23F3-5E92-6DAE624DBCC0",
-                "B5AC5B2E-7B40-21B8-A8F8-7A310DF04A2D",
-                "CF841EBA-38C9-0E85-EEBA-889935675298",
-                "6DA1A00D-6D7F-55F2-A0A2-CE70392EF068",
+                LogicalIdentifier = new string[]
+                {
+                    "F1E7CDB4-B48C-A858-C4CD-0906A6DD7929",
+                    "466FAD63-FAF0-E42F-ACFA-2B1C5D9C272D",
+                    "D45174E0-0E58-EE54-BE84-33C855425358",
+                    "418C3FA6-427C-B2C5-B1A1-59F38F482C67",
+                    "5F495B98-C896-A848-9C57-6B862C89EF7E",
+                    "BAE3627B-1E5F-23F3-5E92-6DAE624DBCC0",
+                    "B5AC5B2E-7B40-21B8-A8F8-7A310DF04A2D",
+                    "CF841EBA-38C9-0E85-EEBA-889935675298",
+                    "6DA1A00D-6D7F-55F2-A0A2-CE70392EF068",
                 }
             };
-            healthRecordsRequests.Add(healthRecordsRequest);
-            return await CallForResources(healthRecordsRequests);
+            return healthRecordsRequest;
         }
+        #endregion
     }
 }

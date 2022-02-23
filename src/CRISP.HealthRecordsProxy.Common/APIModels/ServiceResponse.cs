@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
+using CRISP.HealthRecordsProxy.Common.DomainModels.Abstraction;
 
 namespace CRISP.HealthRecordsProxy.Common.APIModels
 {
@@ -9,9 +10,9 @@ namespace CRISP.HealthRecordsProxy.Common.APIModels
     /// </summary>
     public class HealthRecordsResponse
     {
-        public IList<SpecimenOverviewModel> Specimens { get; }
-        public IList<ObservationOverviewModel> Observations { get; }
-        public string ImagingStudyViewUrl { get; set; }
+        public IEnumerable<OverviewModel> Specimens { get; set; }
+        public IEnumerable<OverviewModel> Observations { get; set; }
+        public IEnumerable<OverviewModel> ImagingStudy { get; set; }
     }
 
     // Acutal Request is an IEnumerable of this
