@@ -1,20 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using CRISP.Extensions.System.Base;
 using CRISP.Fhir.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace CRISP.HealthRecordProxy.Services
 {
+    public interface IResourceClient
+    {
+        public Task<IEnumerable<T>> GetResources<T>(string resourceName, List<string> logicalIds);
+    }
+
     public class ResourceClient : IResourceClient
     {
-
         private readonly ILogger<ResourceClient> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private const string SystemUserName = "HealthRecordProxy";
+        private const string SystemOrganization = "CRISP";
 
         public ResourceClient(ILogger<ResourceClient> logger, IHttpClientFactory httpClientFactory)
         {
@@ -34,18 +39,61 @@ namespace CRISP.HealthRecordProxy.Services
             var client = CreateClient(resourceName);
             var query = "?" + string.Join("&", ids.Select(id => $"_id={id}"));
             var request = new HttpRequestMessage(HttpMethod.Get, query);
-            request.Headers.Add("Username", "HEALTHPROXY");
-            request.Headers.Add("Orgname", "CRISP");
-            var response = await client.SendAsync(request);
-            var body = await response.Content.ReadAsStringAsync();
-            var bundle = JsonConvert.DeserializeObject<Bundle>(body);
-            return bundle.Entry.Where(x => x.BaseEntryResource is TOut).Select(x => x.BaseEntryResource).Cast<TOut>();
+
+            // Set the headers for the request
+            request.Headers.Add("Username", SystemUserName);
+            request.Headers.Add("Orgname", SystemOrganization);
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                var isBundle = TryHandleBundle(response, out Bundle bundle);
+                if (isBundle)
+                    return bundle.Entry.Where(x => x.BaseEntryResource is TOut)
+                        .Select(x => x.BaseEntryResource)
+                        .Cast<TOut>();
+
+                return null;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "An exception has occured while attempting to obtain the FHIR Resource");
+                throw;
+            }
         }
-    }
+
+        private bool TryHandleBundle(HttpResponseMessage message, out Bundle bundle)
+        {
+            if (!message.IsSuccessStatusCode)
+            {
+                _logger.LogInformation(":: Bundle request failed with status code {StatusCode}", message.StatusCode);
+                bundle = null;
+                return false;
+            }
+
+            var body = message.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            // Check if body present
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                _logger.LogInformation(":: Bundle request is empty");
+                bundle = null;
+                return false;
+            }
+
+            try
+            {
+                bundle = JsonConvert.DeserializeObject<Bundle>(body);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Bundle Failed to Deserialize");
+                bundle = null;
+                return false;
+            }
 
 
-    public interface IResourceClient
-    {
-        public Task<IEnumerable<T>> GetResources<T>(string resourceName, List<string> logicalIds);
+            return true;
+        }
     }
 }

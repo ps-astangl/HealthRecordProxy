@@ -3,13 +3,11 @@ using CRISP.HealthRecordProxy.Extensions;
 using CRISP.Providers.Models.ImagingStudy;
 using CRISP.Providers.Models.Observation;
 using CRISP.Providers.Models.Specimen;
-using CRISP.Telemetry.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 
 namespace CRISP.HealthRecordProxy
 {
