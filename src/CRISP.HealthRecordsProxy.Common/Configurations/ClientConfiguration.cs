@@ -1,4 +1,4 @@
-﻿namespace CRISP.HealthRecordProxy.Configurations
+﻿namespace CRISP.HealthRecordsProxy.Common.Configurations
 {
 
     public class ClientConfiguration

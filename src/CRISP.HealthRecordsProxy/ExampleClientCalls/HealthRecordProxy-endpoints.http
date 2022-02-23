@@ -1,0 +1,11 @@
+###
+GET https://localhost:5001/Resource/GetAllRequest
+
+###
+GET https://localhost:5001/Resource/GetImagingStudyRequest
+
+###
+GET https://localhost:5001/Resource/GetObservationRequest
+
+###
+GET https://localhost:5001/Resource/GetSpecimenRequest
