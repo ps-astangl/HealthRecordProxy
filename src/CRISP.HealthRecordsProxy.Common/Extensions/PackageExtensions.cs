@@ -9,9 +9,8 @@ using CRISP.Providers.Models.Observation;
 
 namespace CRISP.HealthRecordsProxy.Common.Extensions
 {
-
     /// <summary>
-    /// Stolen from InContext
+    /// Stolen from InContext -- It hurts to look at, assume it works
     /// </summary>
     public static class PackageExtensions
     {

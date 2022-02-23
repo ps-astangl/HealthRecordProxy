@@ -4,7 +4,6 @@ using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
-using CRISP.Extensions.DependencyInjection;
 using CRISP.HealthRecordProxy.Configurations;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.Extensions;
@@ -15,13 +14,61 @@ using Polly.Extensions.Http;
 
 namespace CRISP.HealthRecordProxy.Extensions
 {
-
     public static class StartupExtensions
     {
         public static void AddResourceService(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             serviceCollection.AddTransient<IResourceClient, ResourceClient>();
+            serviceCollection.AddTransient<IResourceService, ResourceService>();
             serviceCollection.AddObservationClient(configuration);
+            serviceCollection.AddSpecimenClient(configuration);
+            serviceCollection.AddImagingStudyClient(configuration);
+        }
+
+        public static IServiceCollection AddImagingStudyClient(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            const string configurationName = "ImagingStudyClientConfiguration";
+            const string clientName = "ImagingStudy";
+
+            // add IHttpClientFactory for the web client
+            var config = configuration
+                .GetSection(configurationName)
+                .Get<ClientConfiguration>();
+
+            var httpClientConfig = new HttpClientConfiguration(
+                clientName: clientName,
+                baseAddress: new Uri(config.BaseAddress),
+                timeout: TimeSpan.FromSeconds(config.TimeoutSeconds));
+
+            services
+                .AddNamedHttpClient(httpClientConfig)
+                .AddClientErrorPolicy(config);
+
+            return services;
+        }
+
+        public static IServiceCollection AddSpecimenClient(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            const string observationClientConfiguration = "SpecimenClientConfiguration";
+            const string clientName = "Specimen";
+
+            // add IHttpClientFactory for the web client
+            var config = configuration
+                .GetSection(observationClientConfiguration)
+                .Get<ClientConfiguration>();
+
+            var httpClientConfig = new HttpClientConfiguration(
+                clientName: clientName,
+                baseAddress: new Uri(config.BaseAddress),
+                timeout: TimeSpan.FromSeconds(config.TimeoutSeconds));
+
+            services
+                .AddNamedHttpClient(httpClientConfig)
+                .AddClientErrorPolicy(config);
+
+            return services;
         }
 
         public static IServiceCollection AddObservationClient(this IServiceCollection services,

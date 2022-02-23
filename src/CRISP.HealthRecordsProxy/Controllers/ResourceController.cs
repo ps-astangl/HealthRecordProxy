@@ -7,6 +7,7 @@ using CRISP.Providers.Models.Observation;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CRISP.HealthRecordProxy.Controllers
 {
@@ -17,37 +18,33 @@ namespace CRISP.HealthRecordProxy.Controllers
     public class ResourceController : ControllerBase
     {
         private readonly ILogger<ResourceController> _logger;
-        private readonly IResourceClient _resourceClient;
+        private readonly IResourceService _resourceService;
 
         /// <inheritdoc />
-        public ResourceController(ILogger<ResourceController> logger, IResourceClient resourceClient)
+        public ResourceController(ILogger<ResourceController> logger, IResourceService resourceService)
         {
             _logger = logger;
-            _resourceClient = resourceClient;
-        }
-
-        [HttpGet, Route("[action]")]
-        public async Task<IActionResult> Test()
-        {
-            var resources = await _resourceClient
-                .GetResources<ObservationReportFhirModel>("Observation",
-                    new List<string> {"BAC0482A-379D-5CB3-E24F-5BF930324840"});
-            return Ok(resources);
+            _resourceService = resourceService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CallForResources([FromBody] IEnumerable<HealthRecordsRequest> healthRecordsRequest)
+        public async Task<ActionResult> CallForResources(
+            [FromBody] IEnumerable<HealthRecordsRequest> healthRecordsRequest)
         {
-            var resources = await _resourceClient
-                .GetResources<ObservationReportFhirModel>("Observation",
-                    new List<string> {"BAC0482A-379D-5CB3-E24F-5BF930324840"});
-            return Ok(resources);
+            var resources = await _resourceService.GetResources(healthRecordsRequest);
+            var stringResult = JsonConvert.SerializeObject(resources);
+            return new ContentResult
+            {
+                ContentType = "Application/json",
+                Content = stringResult,
+                StatusCode = 200
+            };
         }
 
         [HttpGet, Route("[action]")]
-        public ActionResult GetExampleRequest()
+        public async Task<ActionResult> GetObservationRequest()
         {
-            IEnumerable<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
             {
                 ResourceType = nameof(Observation),
@@ -65,7 +62,56 @@ namespace CRISP.HealthRecordProxy.Controllers
                     "F20005DB-3C5D-817A-6AFE-3DE73488EE9E"
                 }
             };
-            return Ok(healthRecordsRequests.Append(healthRecordsRequest));
+            healthRecordsRequests.Add(healthRecordsRequest);
+            return await CallForResources(healthRecordsRequests);
+        }
+
+        [HttpGet, Route("[action]")]
+        public async Task<ActionResult> GetSpecimenRequest()
+        {
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
+            {
+                ResourceType = nameof(Specimen),
+                LogicalIdentifier = new string[]
+                {
+                    "FF50D2A0-E3EE-5CBE-916E-E0F5A535CDC1",
+                    "B3D86F8B-8FDD-C1F6-F7C4-3AC21CD66418",
+                    "44D79F55-F0DF-5059-D6BA-F677092C1EA0",
+                    "0E08FEEA-2DB7-8F02-1471-351962F3974D",
+                    "9B4841DE-1EF5-8B5C-9D23-E12048572186",
+                    "AEAEAE5B-4DB2-3BF6-A7CF-A84810B85612",
+                    "603D3038-4AA8-D5FD-93F3-A3A020862202",
+                    "5439307F-9F67-A701-651F-639FE3CF4B57",
+                    "CB7125AB-C516-BDF1-22B1-80141D1815A7",
+                    "E4A6A8C4-E7C1-D5FC-B231-4507BA3A193F"
+                }
+            };
+            healthRecordsRequests.Add(healthRecordsRequest);
+            return await CallForResources(healthRecordsRequests);
+        }
+
+        [HttpGet, Route("[action]")]
+        public async Task<ActionResult> GetImagingStudyRequest()
+        {
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
+            {
+                ResourceType = nameof(ImagingStudy),
+                LogicalIdentifier = new string[] {
+                "F1E7CDB4-B48C-A858-C4CD-0906A6DD7929",
+                "466FAD63-FAF0-E42F-ACFA-2B1C5D9C272D",
+                "D45174E0-0E58-EE54-BE84-33C855425358",
+                "418C3FA6-427C-B2C5-B1A1-59F38F482C67",
+                "5F495B98-C896-A848-9C57-6B862C89EF7E",
+                "BAE3627B-1E5F-23F3-5E92-6DAE624DBCC0",
+                "B5AC5B2E-7B40-21B8-A8F8-7A310DF04A2D",
+                "CF841EBA-38C9-0E85-EEBA-889935675298",
+                "6DA1A00D-6D7F-55F2-A0A2-CE70392EF068",
+                }
+            };
+            healthRecordsRequests.Add(healthRecordsRequest);
+            return await CallForResources(healthRecordsRequests);
         }
     }
 }
