@@ -11,4 +11,10 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CRISP.HealthRecordsProxy.Common\CRISP.HealthRecordsProxy.Common.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="FhirAbstractions" />
+    </ItemGroup>
 </Project>

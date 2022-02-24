@@ -1,4 +1,5 @@
 ﻿using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models;
+using CRISP.Storage.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext
@@ -167,6 +168,7 @@ namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext
                     .HasForeignKey(d => d.ObservationId)
                     .HasConstraintName("FK__Observati__Obser__44CA3770");
             });
+
             OnModelCreatingPartial(modelBuilder);
 
         }

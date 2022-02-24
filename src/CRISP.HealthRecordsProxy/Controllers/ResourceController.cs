@@ -6,6 +6,8 @@ using CRISP.Fhir.Database;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.APIModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
+using CRISP.HealthRecordsProxy.Common.Mapping;
+using CRISP.HealthRecordsProxy.Repository;
 using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext;
 using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models;
 using CRISP.Providers.Models.Observation;
@@ -83,8 +85,6 @@ namespace CRISP.HealthRecordProxy.Controllers
             return await CallForResources(healthRecordsRequests);
         }
 
-
-
         [HttpGet, Route("[action]")]
         public async Task<ActionResult> GetSpecimenRequest()
         {
@@ -93,8 +93,6 @@ namespace CRISP.HealthRecordProxy.Controllers
             healthRecordsRequests.Add(healthRecordsRequest);
             return await CallForResources(healthRecordsRequests);
         }
-
-
 
         [HttpGet, Route("[action]")]
         public async Task<ActionResult> GetImagingStudyRequest()
@@ -119,11 +117,25 @@ namespace CRISP.HealthRecordProxy.Controllers
                 .Observations
                 .Where(x => ids.Contains(x.Id))
                 .Include(x => x.ObservationsJson)
-                .Include(x => x.ObservationsCode)
-                .Include(x => x.ObservationsPerformers)
                 .Include(x => x.ObservationsSpecimen)
                 .ToListAsync();
-            return foo.Select(x => x.Map());
+
+            // No clue if this works with other sets of Id's
+            var jsons = foo.SelectMany(x => x.ObservationsJson.Select(json => json.Response));
+            var fhirModel = jsons.Select(x => JsonConvert.DeserializeObject<ObservationReportFhirModel>(x));
+            return fhirModel.Select(x => x.ToView());
+        }
+
+
+
+        [HttpGet, Route("[action]")]
+        public async Task<dynamic> ObservationStoreTest([FromServices] IObservationRepository context)
+        {
+            var request = ObservationHealthRecordsRequest();
+            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+
+           var observations = await context.QueryByIds(ids);
+           return observations.Select(x => x.ToView());
         }
 
         #region ExampleRequestObjects

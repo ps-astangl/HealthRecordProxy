@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.Configurations;
 using CRISP.HealthRecordsProxy.Common.Extensions;
+using CRISP.HealthRecordsProxy.Repository;
+using CRISP.Providers.Models.Observation;
+using CRISP.Storage.Object;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -23,6 +26,9 @@ namespace CRISP.HealthRecordProxy.Extensions
             serviceCollection.AddObservationClient(configuration);
             serviceCollection.AddSpecimenClient(configuration);
             serviceCollection.AddImagingStudyClient(configuration);
+            serviceCollection.AddTransient<IObservationRepository, ObservationRepository>();
+            serviceCollection.AddAzureBlobStorage<Guid, ObservationReportFhirModel>(configuration, "FHIRJSONStorage",
+                "FHIRJSONStorage");
         }
 
         public static IServiceCollection AddImagingStudyClient(this IServiceCollection services,
@@ -147,5 +153,21 @@ namespace CRISP.HealthRecordProxy.Extensions
         }
 
         private static readonly Regex AseEndpointRegex = new Regex("^[^.]+\\.azure\\.[^.]+\\.local$");
+
+        public static IServiceCollection AddAzureBlobStorage<TKey, TValue>(
+            this IServiceCollection serviceCollection,
+            IConfiguration configuration,
+            string configSection,
+            string connectionStringName)
+            where TValue : class
+        {
+            string connectionString = configuration.GetConnectionString(connectionStringName);
+            return connectionString == "local"
+                ? serviceCollection.AddSingleton<IStoreObjects<TKey, TValue>, MemoryObjectStorage<TKey, TValue>>()
+                : serviceCollection
+                    .AddSingleton<IProvideAzureBlobs<TKey>>(
+                        (IProvideAzureBlobs<TKey>) new AzureBlobProvider<TKey>(configuration, connectionString,
+                            configSection)).AddScoped<IStoreObjects<TKey, TValue>, AzureObjectStorage<TKey, TValue>>();
+        }
     }
 }
