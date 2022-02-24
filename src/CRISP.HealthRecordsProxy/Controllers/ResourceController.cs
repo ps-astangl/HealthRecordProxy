@@ -37,8 +37,7 @@ namespace CRISP.HealthRecordProxy.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CallForResources(
-            [FromBody] IEnumerable<HealthRecordsRequest> healthRecordsRequest)
+        public async Task<ActionResult> CallForResources([FromBody] IEnumerable<HealthRecordsRequest> healthRecordsRequest)
         {
             var resources = await _resourceService.GetResources(healthRecordsRequest);
 
@@ -126,8 +125,6 @@ namespace CRISP.HealthRecordProxy.Controllers
             return fhirModel.Select(x => x.ToView());
         }
 
-
-
         [HttpGet, Route("[action]")]
         public async Task<dynamic> ObservationStoreTest([FromServices] IObservationRepository context)
         {
@@ -136,6 +133,13 @@ namespace CRISP.HealthRecordProxy.Controllers
 
            var observations = await context.QueryByIds(ids);
            return observations.Select(x => x.ToView());
+        }
+
+        [HttpPost, Route("[action]")]
+        public async Task<dynamic> TestSearch([FromServices] IObservationRepository observationRepository, [FromBody] IEnumerable<RequestModel> requestModel)
+        {
+            var observations = await observationRepository.QueryByIds(requestModel.Select(x => x.Id));
+            return observations.Select(x => x.ToView());
         }
 
         #region ExampleRequestObjects
@@ -202,5 +206,10 @@ namespace CRISP.HealthRecordProxy.Controllers
             return healthRecordsRequest;
         }
         #endregion
+    }
+
+    public class RequestModel
+    {
+        public Guid Id { get; set; }
     }
 }
