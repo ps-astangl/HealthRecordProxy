@@ -66,6 +66,5 @@ namespace CRISP.HealthRecordsProxy.Repository
                 throw;
             }
         }
-
     }
 }

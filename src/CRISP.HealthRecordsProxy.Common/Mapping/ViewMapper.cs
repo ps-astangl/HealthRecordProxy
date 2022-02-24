@@ -21,7 +21,5 @@ namespace CRISP.HealthRecordsProxy.Common.Mapping
             ImagingStudyOverviewModel specimenOverviewModel = new ImagingStudyOverviewModel(imagingStudy);
             return specimenOverviewModel;
         }
-
-        // public static CRISP.HealthRecordProxy.Repository.Context.ObservationContext.Models.
     }
 }

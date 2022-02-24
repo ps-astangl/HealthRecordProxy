@@ -31,10 +31,8 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
             return !string.IsNullOrWhiteSpace(output) ? output : string.Empty;
         }
 
-
         public static string ToUiString(this Quantity quantity) =>
             $"{quantity.Comparator?.Trim()}{FormatRationalNumber(quantity.Value)}{FormatUnits(quantity.Unit)}";
-
 
         private static string FormatRationalNumber(IFormattable val)
         {
@@ -53,10 +51,7 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
 
             return val.ToString("G", CultureInfo.InvariantCulture);
         }
-
-        private static string FormatUnits(string units) =>
-            !string.IsNullOrWhiteSpace(units) ? $" {units}" : string.Empty;
-
+        private static string FormatUnits(string units) => !string.IsNullOrWhiteSpace(units) ? $" {units}" : string.Empty;
         public static string ToUiString(this string str)
         {
             if (string.IsNullOrWhiteSpace(str))
@@ -67,9 +62,7 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
                 .Replace("\n", SingleWhiteSpace)
                 .Trim();
         }
-
         public static string ToUiString(this FHIRDateTime fhirDateTime) => fhirDateTime.ToString();
-
         public static string ToUiString(this ReferenceRange referenceRange)
         {
             var text = referenceRange.Text;
@@ -78,9 +71,7 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
                 ? text
                 : QuantityRangeBuilder(referenceRange.Low, referenceRange.High, " - ", false);
         }
-
-        private static string QuantityRangeBuilder(SimpleQuantity low, SimpleQuantity high, string separator,
-            bool includeUnits = true)
+        private static string QuantityRangeBuilder(SimpleQuantity low, SimpleQuantity high, string separator, bool includeUnits = true)
         {
             var stringBuilder = new StringBuilder();
             var lowValue = FormatRationalNumber(low?.Value);
@@ -118,10 +109,8 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
 
             return stringBuilder.ToString();
         }
-
         public static string ToUiString(this bool value) => value.ToString();
         public static string ToUiString(this Attachment attachment) => attachment.Data;
-
         public static string ToUiString(this Period period)
         {
             var start = period.Start;
@@ -147,12 +136,8 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
 
             return output;
         }
-
-        public static string ToUiString(this CRISP.Fhir.Models.Range range) =>
-            QuantityRangeBuilder(range.Low, range.High, " - ");
-
+        public static string ToUiString(this CRISP.Fhir.Models.Range range) => QuantityRangeBuilder(range.Low, range.High, " - ");
         public static string ToUiString(this SampledData sampledData) => sampledData.Data;
-
         public static string ToUiString(this Ratio ratio)
         {
             var numerator = ratio.Numerator;
@@ -166,7 +151,6 @@ namespace CRISP.HealthRecordsProxy.Common.Extensions
                         numerator.Unit),
                     BuildRatioComponent(null, denominator.Value ?? 1, denominator.Unit));
         }
-
         private static string BuildRatioComponent(string comparator, double value, string units)
         {
             var emptyComparatorIfNeeded = !string.IsNullOrEmpty(comparator) ? comparator : string.Empty;

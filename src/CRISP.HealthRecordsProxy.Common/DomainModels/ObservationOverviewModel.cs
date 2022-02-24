@@ -58,6 +58,5 @@ namespace CRISP.HealthRecordsProxy.Common.DomainModels
                    ?? observation.ValueSampledData?.ToUiString()
                    ?? string.Empty;
         }
-
     }
 }
