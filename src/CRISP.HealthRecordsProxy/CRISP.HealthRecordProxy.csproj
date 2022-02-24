@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CRISP.HealthRecordProxy.Repository\CRISP.HealthRecordProxy.Repository.csproj" />
+      <ProjectReference Include="..\CRISP.HealthRecordsProxy.Repository\CRISP.HealthRecordsProxy.Repository.csproj" />
       <ProjectReference Include="..\CRISP.HealthRecordsProxy.Common\CRISP.HealthRecordsProxy.Common.csproj" />
     </ItemGroup>
 </Project>

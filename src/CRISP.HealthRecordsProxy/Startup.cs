@@ -1,6 +1,6 @@
 using CRISP.Fhir.Models;
 using CRISP.HealthRecordProxy.Extensions;
-using CRISP.HealthRecordProxy.Repository.Context.ObservationContext;
+using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext;
 using CRISP.Providers.Models.ImagingStudy;
 using CRISP.Providers.Models.Observation;
 using CRISP.Providers.Models.Specimen;

@@ -2,7 +2,6 @@
 using CRISP.Providers.Models.ImagingStudy;
 using CRISP.Providers.Models.Observation;
 using CRISP.Providers.Models.Specimen;
-
 namespace CRISP.HealthRecordsProxy.Common.Mapping
 {
     public static class ViewMapper
@@ -22,5 +21,7 @@ namespace CRISP.HealthRecordsProxy.Common.Mapping
             ImagingStudyOverviewModel specimenOverviewModel = new ImagingStudyOverviewModel(imagingStudy);
             return specimenOverviewModel;
         }
+
+        // public static CRISP.HealthRecordProxy.Repository.Context.ObservationContext.Models.
     }
 }

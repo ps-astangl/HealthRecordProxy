@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CRISP.HealthRecordProxy.Repository.Context.ObservationContext;
+using CRISP.Fhir.Database;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.APIModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
+using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext;
+using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models;
+using CRISP.Providers.Models.Observation;
+using CRISP.Storage.Object;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -102,19 +106,24 @@ namespace CRISP.HealthRecordProxy.Controllers
         }
 
         [HttpGet, Route("[action]")]
-        public async Task<dynamic> Test([FromServices] ObservationContext context)
+        public async Task<dynamic> ObservationDatabaseTest([FromServices] ObservationContext context)
         {
             var request = ObservationHealthRecordsRequest();
             var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
 
-            var single = ids.FirstOrDefault();
-
+            List<Observations> observations =  (await context.Observations
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync());
 
             var foo = await context
                 .Observations
                 .Where(x => ids.Contains(x.Id))
+                .Include(x => x.ObservationsJson)
+                .Include(x => x.ObservationsCode)
+                .Include(x => x.ObservationsPerformers)
+                .Include(x => x.ObservationsSpecimen)
                 .ToListAsync();
-            return foo;
+            return foo.Select(x => x.Map());
         }
 
         #region ExampleRequestObjects
