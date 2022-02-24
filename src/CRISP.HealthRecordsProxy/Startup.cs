@@ -1,10 +1,12 @@
 using CRISP.Fhir.Models;
 using CRISP.HealthRecordProxy.Extensions;
+using CRISP.HealthRecordProxy.Repository.Context.ObservationContext;
 using CRISP.Providers.Models.ImagingStudy;
 using CRISP.Providers.Models.Observation;
 using CRISP.Providers.Models.Specimen;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +28,12 @@ namespace CRISP.HealthRecordProxy
             EntryJsonConverter.AddOrUpdateMapping<ObservationReportFhirModel>("Observation");
             EntryJsonConverter.AddOrUpdateMapping<SpecimenFhirModel>("Specimen");
             EntryJsonConverter.AddOrUpdateMapping<ImagingStudyFHIRModel>("ImagingStudy");
+            services.AddDbContextPool<ObservationContext>(options =>
+            {
+                options.UseSqlServer(_configuration["ConnectionStrings:ObservationContext"]);
+                options.EnableSensitiveDataLogging();
+            });
+
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

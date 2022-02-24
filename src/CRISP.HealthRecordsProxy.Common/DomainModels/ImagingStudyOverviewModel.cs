@@ -24,18 +24,5 @@ namespace CRISP.HealthRecordsProxy.Common.DomainModels
 
             ViewUrl = endpoint?.Address;
         }
-
-        /// <summary>
-        /// Constructs overview model from Hl7 FHIR resources
-        /// </summary>
-        public ImagingStudyOverviewModel(ImagingStudy imagingStudy)
-        {
-            var endpointRef = imagingStudy.Endpoint?.FirstOrDefault(e => e.Reference.StartsWith(Hashtag))?.Reference;
-            var endpointRefId = endpointRef?.TrimStart(Hashtag);
-            var endpoint = imagingStudy.Contained?.FirstOrDefault(c =>
-                string.Equals(c.Id, endpointRefId, StringComparison.OrdinalIgnoreCase)) as Endpoint;
-
-            ViewUrl = endpoint?.Address;
-        }
     }
 }

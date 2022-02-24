@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CRISP.HealthRecordProxy.Repository.Context.ObservationContext;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.APIModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
-using CRISP.Providers.Models.ImagingStudy;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -97,6 +99,22 @@ namespace CRISP.HealthRecordProxy.Controllers
             var healthRecordsRequest = ImagingStudyHealthRecordsRequest();
             healthRecordsRequests.Add(healthRecordsRequest);
             return await CallForResources(healthRecordsRequests);
+        }
+
+        [HttpGet, Route("[action]")]
+        public async Task<dynamic> Test([FromServices] ObservationContext context)
+        {
+            var request = ObservationHealthRecordsRequest();
+            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+
+            var single = ids.FirstOrDefault();
+
+
+            var foo = await context
+                .Observations
+                .Where(x => ids.Contains(x.Id))
+                .ToListAsync();
+            return foo;
         }
 
         #region ExampleRequestObjects
