@@ -89,5 +89,18 @@ namespace CRISP.HealthRecordProxy.Controllers
                 StatusCode = 200
             };
         }
+
+        [HttpGet, Route("[action]")]
+        public dynamic GetExampleRequest()
+        {
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            HealthRecordsRequest observationRequest = ExampleRequests.ObservationHealthRecordsRequest();
+            HealthRecordsRequest specimenRequest = ExampleRequests.SpecimenHealthRecordsRequest();
+            HealthRecordsRequest imagingStudyRequest = ExampleRequests.ImagingStudyHealthRecordsRequest();
+            healthRecordsRequests.Add(observationRequest);
+            healthRecordsRequests.Add(specimenRequest);
+            healthRecordsRequests.Add(imagingStudyRequest);
+            return healthRecordsRequests;
+        }
     }
 }

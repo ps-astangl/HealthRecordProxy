@@ -10,7 +10,6 @@ namespace CRISP.HealthRecordsProxy.Common.APIModels
     /// </summary>
     public class HealthRecordsResponse
     {
-        public HealthRecordsResponse() {}
         public IEnumerable<OverviewModel> Specimens { get; set; }
         public IEnumerable<OverviewModel> Observations { get; set; }
         public IEnumerable<OverviewModel> ImagingStudy { get; set; }
@@ -21,9 +20,4 @@ namespace CRISP.HealthRecordsProxy.Common.APIModels
     {
         public string ResourceType { get; set; }
         public IEnumerable<Guid> LogicalIdentifier { get; set; } }
-    public class HealthRecordsDbRequest
-    {
-        public string ResourceType { get; set; }
-        public IEnumerable<Guid> LogicalIdentifier { get; set; }
-    }
 }
