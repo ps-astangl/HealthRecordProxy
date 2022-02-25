@@ -20,8 +20,7 @@ namespace CRISP.HealthRecordsProxy.Common.APIModels
     public class HealthRecordsRequest
     {
         public string ResourceType { get; set; }
-        public IEnumerable<string> LogicalIdentifier { get; set; }
-    }
+        public IEnumerable<Guid> LogicalIdentifier { get; set; } }
     public class HealthRecordsDbRequest
     {
         public string ResourceType { get; set; }

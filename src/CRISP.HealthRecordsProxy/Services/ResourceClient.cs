@@ -11,7 +11,7 @@ namespace CRISP.HealthRecordProxy.Services
 {
     public interface IResourceClient
     {
-        public Task<IEnumerable<T>> GetResources<T>(string resourceName, List<string> logicalIds);
+        public Task<IEnumerable<T>> GetResources<T>(string resourceName, List<Guid> logicalIds);
     }
 
     public class ResourceClient : IResourceClient
@@ -27,14 +27,14 @@ namespace CRISP.HealthRecordProxy.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<T>> GetResources<T>(string resourceName, List<string> logicalIds)
+        public async Task<IEnumerable<T>> GetResources<T>(string resourceName, List<Guid> logicalIds)
         {
             return await ExecuteFhirRequest<T>(logicalIds, resourceName);
         }
 
         private HttpClient CreateClient(string resourceName) => _httpClientFactory.CreateClient(resourceName);
 
-        private async Task<IEnumerable<TOut>> ExecuteFhirRequest<TOut>(IList<string> ids, string resourceName)
+        private async Task<IEnumerable<TOut>> ExecuteFhirRequest<TOut>(IList<Guid> ids, string resourceName)
         {
             var client = CreateClient(resourceName);
             var query = "?" + string.Join("&", ids.Select(id => $"_id={id}"));

@@ -34,12 +34,43 @@ namespace CRISP.HealthRecordProxy.Controllers
             _imagingStudyRepository = imagingStudyRepository;
         }
 
-        [HttpPost, Route("[action]")]
-        public async Task<dynamic> Search([FromBody] IEnumerable<HealthRecordsDbRequest> requestModel)
+        [HttpGet, Route("[action]")]
+        public async Task<dynamic> GetAllExample()
         {
-            var ids = requestModel.SelectMany(x => x.LogicalIdentifier);
-            var observations = await _observationRepository.QueryByIds(ids);
-            return observations.Select(x => x.ToView());
+            List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
+            HealthRecordsRequest observationRequest = ExampleRequests.ObservationHealthRecordsRequest();
+            HealthRecordsRequest specimenRequest = ExampleRequests.SpecimenHealthRecordsRequest();
+            HealthRecordsRequest imagingStudyRequest = ExampleRequests.ImagingStudyHealthRecordsRequest();
+            healthRecordsRequests.Add(observationRequest);
+            healthRecordsRequests.Add(specimenRequest);
+            healthRecordsRequests.Add(imagingStudyRequest);
+
+            // Extract the observation ids
+            var observationIds = healthRecordsRequests
+                .Where(x => x.ResourceType.Equals("Observation", StringComparison.InvariantCultureIgnoreCase))
+                .SelectMany(x => x.LogicalIdentifier);
+
+            var resourceDict =
+                healthRecordsRequests.ToDictionary(x => x.ResourceType, request => request.LogicalIdentifier);
+
+            var observations = await _observationRepository.QueryByIds(resourceDict.GetValueOrDefault("Observation"));
+
+            var specimens = await _specimenRepository.QueryByIds(resourceDict.GetValueOrDefault("Specimen"));
+            var imagingStudies = await _imagingStudyRepository.QueryByIds(resourceDict.GetValueOrDefault("ImagingStudy"));
+
+            HealthRecordsResponse healthRecordsResponse = new HealthRecordsResponse
+            {
+                Specimens = specimens?.Select(x => x.ToView()),
+                Observations = observations?.Select(x => x.ToView()),
+                ImagingStudy = imagingStudies.Select(x => x.ToView())
+            };
+            var stringResult = JsonConvert.SerializeObject(healthRecordsResponse);
+            return new ContentResult
+            {
+                ContentType = "Application/json",
+                Content = stringResult,
+                StatusCode = 200
+            };
         }
 
 
@@ -47,7 +78,7 @@ namespace CRISP.HealthRecordProxy.Controllers
         public async Task<dynamic> GetObservationExample()
         {
             var request = ExampleRequests.ObservationHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+            var ids = request.LogicalIdentifier.Select(x => x).ToList();
 
             var observations = await _observationRepository.QueryByIds(ids);
             var obs = observations
@@ -61,7 +92,7 @@ namespace CRISP.HealthRecordProxy.Controllers
         public async Task<dynamic> GetSpecimenExample()
         {
             var request = ExampleRequests.SpecimenHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+            var ids = request.LogicalIdentifier.Select(x => x).ToList();
             var specimens = await _specimenRepository.QueryByIds(ids);
 
             var sps =specimens
@@ -75,7 +106,7 @@ namespace CRISP.HealthRecordProxy.Controllers
         public async Task<dynamic> GetImagingStudyExample()
         {
             var request = ExampleRequests.ImagingStudyHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+            var ids = request.LogicalIdentifier.Select(x => x).ToList();
 
             var studies = await _imagingStudyRepository.QueryByIds(ids);
             var img =
