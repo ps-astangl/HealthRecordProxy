@@ -14,4 +14,7 @@
     <ItemGroup>
         <ProjectReference Include="..\CRISP.HealthRecordsProxy.Common\CRISP.HealthRecordsProxy.Common.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="ImagingStudy" />
+    </ItemGroup>
 </Project>

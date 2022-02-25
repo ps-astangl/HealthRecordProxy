@@ -1,6 +1,7 @@
 using System;
 using CRISP.Fhir.Models;
 using CRISP.HealthRecordProxy.Extensions;
+using CRISP.HealthRecordsProxy.Repository.ImagingStudy.Context;
 using CRISP.HealthRecordsProxy.Repository.Observations.Context;
 using CRISP.HealthRecordsProxy.Repository.Specimen.Context;
 using CRISP.Providers.Models.ImagingStudy;
@@ -40,6 +41,11 @@ namespace CRISP.HealthRecordProxy
             services.AddDbContextPool<SpecimenContext>(options =>
             {
                 options.UseSqlServer(_configuration["ConnectionStrings:SpecimenContext"]);
+                options.EnableSensitiveDataLogging();
+            });
+            services.AddDbContextPool<ImagingStudyContext>(options =>
+            {
+                options.UseSqlServer(_configuration["ConnectionStrings:ImagingStudyContext"]);
                 options.EnableSensitiveDataLogging();
             });
 
