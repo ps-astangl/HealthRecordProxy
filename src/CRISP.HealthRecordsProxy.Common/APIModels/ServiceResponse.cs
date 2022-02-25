@@ -10,6 +10,7 @@ namespace CRISP.HealthRecordsProxy.Common.APIModels
     /// </summary>
     public class HealthRecordsResponse
     {
+        public HealthRecordsResponse() {}
         public IEnumerable<OverviewModel> Specimens { get; set; }
         public IEnumerable<OverviewModel> Observations { get; set; }
         public IEnumerable<OverviewModel> ImagingStudy { get; set; }
