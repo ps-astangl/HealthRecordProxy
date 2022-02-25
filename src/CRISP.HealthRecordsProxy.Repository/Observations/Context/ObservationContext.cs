@@ -1,8 +1,7 @@
-﻿using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models;
-using CRISP.Storage.Database;
+﻿using CRISP.HealthRecordsProxy.Repository.Observations.Context.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext
+namespace CRISP.HealthRecordsProxy.Repository.Observations.Context
 {
     public partial class ObservationContext : DbContext
     {
@@ -11,7 +10,7 @@ namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext
         {
         }
 
-        public virtual DbSet<Observations> Observations { get; set; }
+        public virtual DbSet<Models.Observations> Observations { get; set; }
         public virtual DbSet<ObservationsCode> ObservationsCode { get; set; }
         public virtual DbSet<ObservationsJson> ObservationsJson { get; set; }
         public virtual DbSet<ObservationsPerformers> ObservationsPerformers { get; set; }
@@ -23,7 +22,7 @@ namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Observations>(entity =>
+            modelBuilder.Entity<Models.Observations>(entity =>
             {
                 entity.HasKey(e => e.Id)
                     .ForSqlServerIsClustered(false);

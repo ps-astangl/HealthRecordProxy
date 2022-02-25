@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CRISP.Fhir.Database;
-using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext;
-using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models;
+using CRISP.HealthRecordsProxy.Repository.Observations.Context;
 using CRISP.Providers.Models.Observation;
 using CRISP.Storage.Object;
-using Hl7.Fhir.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Resource = CRISP.Fhir.Models.Resource;
-using Task = System.Threading.Tasks.Task;
 
-namespace CRISP.HealthRecordsProxy.Repository
+namespace CRISP.HealthRecordsProxy.Repository.Observations
 {
     public interface IObservationRepository
     {
-        public Task<IList<ObservationReportFhirModel>> QueryByIds(IEnumerable<Guid> ids);
+        public Task<IEnumerable<ObservationReportFhirModel>> QueryByIds(IEnumerable<Guid> ids);
     }
     public class ObservationRepository : IObservationRepository
     {
@@ -34,7 +29,7 @@ namespace CRISP.HealthRecordsProxy.Repository
         }
 
         /// <inheritdoc />
-        public async Task<IList<ObservationReportFhirModel>> QueryByIds(IEnumerable<Guid> ids)
+        public async Task<IEnumerable<ObservationReportFhirModel>> QueryByIds(IEnumerable<Guid> ids)
         {
             return (await _observationContext.Observations.Where(s => ids.Contains(s.Id))
                     .Include(s => s.ObservationsJson)
@@ -43,7 +38,7 @@ namespace CRISP.HealthRecordsProxy.Repository
                 .ToList();
         }
 
-        private async Task<ObservationReportFhirModel> CreateFhirModel(Observations observations)
+        private async Task<ObservationReportFhirModel> CreateFhirModel(Context.Models.Observations observations)
         {
             if (observations == null)
                 throw new ArgumentNullException("Observations", "Cant be null");

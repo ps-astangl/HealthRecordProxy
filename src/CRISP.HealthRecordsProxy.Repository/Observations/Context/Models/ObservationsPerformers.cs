@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models
+namespace CRISP.HealthRecordsProxy.Repository.Observations.Context.Models
 {
     public partial class ObservationsPerformers
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models
+namespace CRISP.HealthRecordsProxy.Repository.Observations.Context.Models
 {
     public partial class Observations
     {

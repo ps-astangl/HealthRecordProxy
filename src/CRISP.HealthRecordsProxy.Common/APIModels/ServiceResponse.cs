@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels.Abstraction;
 
@@ -20,5 +21,10 @@ namespace CRISP.HealthRecordsProxy.Common.APIModels
     {
         public string ResourceType { get; set; }
         public IEnumerable<string> LogicalIdentifier { get; set; }
+    }
+    public class HealthRecordsDbRequest
+    {
+        public string ResourceType { get; set; }
+        public IEnumerable<Guid> LogicalIdentifier { get; set; }
     }
 }

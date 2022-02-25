@@ -7,8 +7,10 @@ using System.Text.RegularExpressions;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.Configurations;
 using CRISP.HealthRecordsProxy.Common.Extensions;
-using CRISP.HealthRecordsProxy.Repository;
+using CRISP.HealthRecordsProxy.Repository.Observations;
+using CRISP.HealthRecordsProxy.Repository.Specimen;
 using CRISP.Providers.Models.Observation;
+using CRISP.Providers.Models.Specimen;
 using CRISP.Storage.Object;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,12 +28,18 @@ namespace CRISP.HealthRecordProxy.Extensions
             serviceCollection.AddObservationClient(configuration);
             serviceCollection.AddSpecimenClient(configuration);
             serviceCollection.AddImagingStudyClient(configuration);
+
+
             serviceCollection.AddTransient<IObservationRepository, ObservationRepository>();
             serviceCollection.AddAzureBlobStorage<Guid, ObservationReportFhirModel>(configuration, "FHIRJSONStorage",
                 "FHIRJSONStorage");
+
+            serviceCollection.AddTransient<ISpecimenRepository, SpecimenRepository>();
+            serviceCollection.AddAzureBlobStorage<Guid, SpecimenFhirModel>(configuration, "FHIRJSONStorage",
+                "FHIRJSONStorage");
         }
 
-        public static IServiceCollection AddImagingStudyClient(this IServiceCollection services,
+        private static IServiceCollection AddImagingStudyClient(this IServiceCollection services,
             IConfiguration configuration)
         {
             const string configurationName = "ImagingStudyClientConfiguration";
@@ -54,7 +62,7 @@ namespace CRISP.HealthRecordProxy.Extensions
             return services;
         }
 
-        public static IServiceCollection AddSpecimenClient(this IServiceCollection services,
+        private static IServiceCollection AddSpecimenClient(this IServiceCollection services,
             IConfiguration configuration)
         {
             const string observationClientConfiguration = "SpecimenClientConfiguration";
@@ -77,7 +85,7 @@ namespace CRISP.HealthRecordProxy.Extensions
             return services;
         }
 
-        public static IServiceCollection AddObservationClient(this IServiceCollection services,
+        private static IServiceCollection AddObservationClient(this IServiceCollection services,
             IConfiguration configuration)
         {
             const string observationClientConfiguration = "ObservationClientConfiguration";
@@ -100,7 +108,7 @@ namespace CRISP.HealthRecordProxy.Extensions
             return services;
         }
 
-        public static IHttpClientBuilder AddNamedHttpClient(
+        private static IHttpClientBuilder AddNamedHttpClient(
             this IServiceCollection serviceCollection,
             HttpClientConfiguration configuration)
         {

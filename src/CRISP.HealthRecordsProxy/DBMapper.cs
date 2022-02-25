@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
+using CRISP.HealthRecordsProxy.Repository.Observations.Context.Models;
 using Microsoft.AspNetCore.Builder;
 
 namespace CRISP.HealthRecordProxy
@@ -7,7 +8,7 @@ namespace CRISP.HealthRecordProxy
     public static class DBMapper
     {
         public static ObservationOverviewModel Map(
-            this CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models.Observations observations)
+            this Observations observations)
         {
             var overviewModel = new ObservationOverviewModel
             {

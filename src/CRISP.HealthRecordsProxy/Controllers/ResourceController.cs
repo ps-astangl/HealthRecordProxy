@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CRISP.Fhir.Database;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.APIModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
 using CRISP.HealthRecordsProxy.Common.Mapping;
-using CRISP.HealthRecordsProxy.Repository;
-using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext;
-using CRISP.HealthRecordsProxy.Repository.Context.ObservationContext.Models;
+using CRISP.HealthRecordsProxy.Repository.Observations.Context;
+using CRISP.HealthRecordsProxy.Repository.Observations.Context.Models;
 using CRISP.Providers.Models.Observation;
-using CRISP.Storage.Object;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -102,46 +98,6 @@ namespace CRISP.HealthRecordProxy.Controllers
             var healthRecordsRequest = ImagingStudyHealthRecordsRequest();
             healthRecordsRequests.Add(healthRecordsRequest);
             return await CallForResources(healthRecordsRequests);
-        }
-
-        [HttpGet, Route("[action]")]
-        public async Task<dynamic> ObservationDatabaseTest([FromServices] ObservationContext context)
-        {
-            var request = ObservationHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
-
-            List<Observations> observations = (await context.Observations
-                .Where(s => ids.Contains(s.Id))
-                .ToListAsync());
-
-            var foo = await context
-                .Observations
-                .Where(x => ids.Contains(x.Id))
-                .Include(x => x.ObservationsJson)
-                .Include(x => x.ObservationsSpecimen)
-                .ToListAsync();
-
-            // No clue if this works with other sets of Id's
-            var jsons = foo.SelectMany(x => x.ObservationsJson.Select(json => json.Response));
-            var fhirModel = jsons.Select(x => JsonConvert.DeserializeObject<ObservationReportFhirModel>(x));
-            return fhirModel.Select(x => x.ToView());
-        }
-
-        [HttpGet, Route("[action]")]
-        public async Task<dynamic> ObservationStoreTest([FromServices] IObservationRepository context)
-        {
-            var request = ObservationHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
-
-            var observations = await context.QueryByIds(ids);
-            return observations.Select(x => x.ToView());
-        }
-
-        [HttpPost, Route("[action]")]
-        public async Task<dynamic> TestSearch([FromServices] IObservationRepository observationRepository, [FromBody] IEnumerable<RequestModel> requestModel)
-        {
-            var observations = await observationRepository.QueryByIds(requestModel.Select(x => x.Id));
-            return observations.Select(x => x.ToView());
         }
 
         #region ExampleRequestObjects
@@ -326,10 +282,5 @@ namespace CRISP.HealthRecordProxy.Controllers
         }
 
         #endregion
-    }
-
-    public class RequestModel
-    {
-        public Guid Id { get; set; }
     }
 }
