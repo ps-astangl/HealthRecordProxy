@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CRISP.HealthRecordsProxy.Common.DomainModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels.Abstraction;
 
 namespace CRISP.HealthRecordsProxy.Common.APIModels

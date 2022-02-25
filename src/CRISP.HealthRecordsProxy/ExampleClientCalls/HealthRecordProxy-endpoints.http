@@ -1,11 +1,27 @@
 ###
-GET https://localhost:5001/Resource/GetAllRequest
+GET https://localhost:5001/Database/GetImagingStudyExample
 
 ###
-GET https://localhost:5001/Resource/GetImagingStudyRequest
+GET https://localhost:5001/Database/GetObservationExample
 
 ###
-GET https://localhost:5001/Resource/GetObservationRequest
+GET https://localhost:5001/Database/GetSpecimenExample
 
 ###
-GET https://localhost:5001/Resource/GetSpecimenRequest
+GET https://localhost:5001/Resource/GetImagingStudyExample
+
+###
+GET https://localhost:5001/Resource/GetObservationExample
+
+###
+GET https://localhost:5001/Resource/GetSpecimenExample
+
+###
+GET https://localhost:5001/Resource/GetAllExample
+
+
+###
+#POST https://localhost:5001/Database/Search
+
+###
+#POST https://localhost:5001/Resource

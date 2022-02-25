@@ -5,43 +5,33 @@ using System.Threading.Tasks;
 using CRISP.HealthRecordsProxy.Common.APIModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
 using CRISP.HealthRecordsProxy.Common.Mapping;
+using CRISP.HealthRecordsProxy.Repository.ImagingStudy;
 using CRISP.HealthRecordsProxy.Repository.Observations;
-using CRISP.HealthRecordsProxy.Repository.Observations.Context;
-using CRISP.HealthRecordsProxy.Repository.Observations.Context.Models;
 using CRISP.HealthRecordsProxy.Repository.Specimen;
-using CRISP.Providers.Models.Observation;
-using CRISP.Providers.Models.Specimen;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace CRISP.HealthRecordProxy.Controllers
 {
+    [Route("[controller]")]
     public class DatabaseController : ControllerBase
     {
         private readonly ILogger<DatabaseController> _logger;
         private readonly IObservationRepository _observationRepository;
         private readonly ISpecimenRepository _specimenRepository;
+        private readonly IImagingStudyRepository _imagingStudyRepository;
 
-        public DatabaseController(ILogger<DatabaseController> logger, IObservationRepository observationRepository,
-            ISpecimenRepository specimenRepository)
+        public DatabaseController(
+            ILogger<DatabaseController> logger,
+            IObservationRepository observationRepository,
+            ISpecimenRepository specimenRepository,
+            IImagingStudyRepository imagingStudyRepository)
         {
             _logger = logger;
             _observationRepository = observationRepository;
             _specimenRepository = specimenRepository;
-        }
-
-        #region Observation Examples
-
-        [HttpGet, Route("[action]")]
-        public async Task<dynamic> ObservationStoreTest([FromServices] IObservationRepository context)
-        {
-            var request = ObservationHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
-
-            var observations = await context.QueryByIds(ids);
-            return observations.Select(x => x.ToView());
+            _imagingStudyRepository = imagingStudyRepository;
         }
 
         [HttpPost, Route("[action]")]
@@ -52,43 +42,56 @@ namespace CRISP.HealthRecordProxy.Controllers
             return observations.Select(x => x.ToView());
         }
 
+        #region Observation Examples
+
+        [HttpGet, Route("[action]")]
+        public async Task<dynamic> GetObservationExample()
+        {
+            var request = ObservationHealthRecordsRequest();
+            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+
+            var observations = await _observationRepository.QueryByIds(ids);
+            return observations
+                ?.Where(x => x != null)
+                ?.Select(x => x.ToView()) ?? new List<ObservationOverviewModel>();
+        }
+
         #endregion
 
         #region Specimen Examples
 
         [HttpGet, Route("[action]")]
-        public async Task<dynamic> ObservationDatabaseTest()
-        {
-            var request = ObservationHealthRecordsRequest();
-            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
-            var obs = await _observationRepository.QueryByIds(ids);
-
-            var result = obs
-                ?.Where(x => x != null)
-                ?.Select(x => x.ToView()) ?? new List<ObservationOverviewModel>();
-            return Ok(result);
-        }
-
-
-        [HttpGet, Route("[action]")]
-        public async Task<dynamic> SpecimenDatabaseTest()
+        public async Task<dynamic> GetSpecimenExample()
         {
             var request = SpecimenHealthRecordsRequest();
             var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
-            var spm = await _specimenRepository.QueryByIds(ids);
+            var specimens = await _specimenRepository.QueryByIds(ids);
 
-            var result = spm
+            return specimens
                 ?.Where(x => x != null)
                 ?.Select(x => x.ToView()) ?? new List<SpecimenOverviewModel>();
-
-            return Ok(result);
         }
 
         #endregion
 
+        #region ImagingStudy Methods
 
+        [HttpGet, Route("[action]")]
+        public async Task<dynamic> GetImagingStudyExample()
+        {
+            var request = ImagingStudyHealthRecordsRequest();
+            var ids = request.LogicalIdentifier.Select(Guid.Parse).ToList();
+
+            var studies = await _imagingStudyRepository.QueryByIds(ids);
+            return
+                studies
+                    ?.Where(x => x != null)
+                    ?.Select(x => x.ToView()) ?? new List<ImagingStudyOverviewModel>();
+        }
+        #endregion
 
         #region RequestExamples
+
         private static HealthRecordsRequest ObservationHealthRecordsRequest()
         {
             HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
@@ -133,7 +136,28 @@ namespace CRISP.HealthRecordProxy.Controllers
             return healthRecordsRequest;
         }
 
-        #endregion
+        private static HealthRecordsRequest ImagingStudyHealthRecordsRequest()
+        {
+            HealthRecordsRequest healthRecordsRequest = new HealthRecordsRequest
+            {
+                ResourceType = nameof(ImagingStudy),
+                LogicalIdentifier = new string[]
+                {
+                    "5a1cac61-b61c-b1c3-01d2-5857a83438eb"
+                    // "F1E7CDB4-B48C-A858-C4CD-0906A6DD7929",
+                    // "466FAD63-FAF0-E42F-ACFA-2B1C5D9C272D",
+                    // "D45174E0-0E58-EE54-BE84-33C855425358",
+                    // "418C3FA6-427C-B2C5-B1A1-59F38F482C67",
+                    // "5F495B98-C896-A848-9C57-6B862C89EF7E",
+                    // "BAE3627B-1E5F-23F3-5E92-6DAE624DBCC0",
+                    // "B5AC5B2E-7B40-21B8-A8F8-7A310DF04A2D",
+                    // "CF841EBA-38C9-0E85-EEBA-889935675298",
+                    // "6DA1A00D-6D7F-55F2-A0A2-CE70392EF068",
+                }
+            };
+            return healthRecordsRequest;
+        }
 
+        #endregion
     }
 }

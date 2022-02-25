@@ -7,8 +7,10 @@ using System.Text.RegularExpressions;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.Configurations;
 using CRISP.HealthRecordsProxy.Common.Extensions;
+using CRISP.HealthRecordsProxy.Repository.ImagingStudy;
 using CRISP.HealthRecordsProxy.Repository.Observations;
 using CRISP.HealthRecordsProxy.Repository.Specimen;
+using CRISP.Providers.Models.ImagingStudy;
 using CRISP.Providers.Models.Observation;
 using CRISP.Providers.Models.Specimen;
 using CRISP.Storage.Object;
@@ -36,6 +38,10 @@ namespace CRISP.HealthRecordProxy.Extensions
 
             serviceCollection.AddTransient<ISpecimenRepository, SpecimenRepository>();
             serviceCollection.AddAzureBlobStorage<Guid, SpecimenFhirModel>(configuration, "FHIRJSONStorage",
+                "FHIRJSONStorage");
+
+            serviceCollection.AddTransient<IImagingStudyRepository, ImagingStudyRepository>();
+            serviceCollection.AddAzureBlobStorage<Guid, ImagingStudyFHIRModel>(configuration, "FHIRJSONStorage",
                 "FHIRJSONStorage");
         }
 

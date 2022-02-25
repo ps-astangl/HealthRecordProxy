@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CRISP.HealthRecordProxy.Services;
 using CRISP.HealthRecordsProxy.Common.APIModels;
 using CRISP.HealthRecordsProxy.Common.DomainModels;
-using CRISP.HealthRecordsProxy.Common.Mapping;
-using CRISP.HealthRecordsProxy.Repository.Observations.Context;
-using CRISP.HealthRecordsProxy.Repository.Observations.Context.Models;
-using CRISP.Providers.Models.Observation;
 using Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -33,12 +27,11 @@ namespace CRISP.HealthRecordProxy.Controllers
             _resourceService = resourceService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CallForResources(
+        // [HttpPost]
+        public async Task<dynamic> CallForResources(
             [FromBody] IEnumerable<HealthRecordsRequest> healthRecordsRequest)
         {
             var resources = await _resourceService.GetResources(healthRecordsRequest);
-
             var observations = resources.Where(x => x is ObservationOverviewModel);
             var specimens = resources.Where(x => x is SpecimenOverviewModel);
             var imagingstudy = resources.Where(x => (x is ImagingStudyOverviewModel));
@@ -49,8 +42,8 @@ namespace CRISP.HealthRecordProxy.Controllers
                 Observations = observations,
                 ImagingStudy = imagingstudy
             };
-
             var stringResult = JsonConvert.SerializeObject(healthRecordsResponse);
+            // return stringResult;
             return new ContentResult
             {
                 ContentType = "Application/json",
@@ -59,8 +52,10 @@ namespace CRISP.HealthRecordProxy.Controllers
             };
         }
 
+        #region ExampleControllerMethods
+
         [HttpGet, Route("[action]")]
-        public async Task<ActionResult> GetAllRequest()
+        public async Task<dynamic> GetAllExample()
         {
             List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             HealthRecordsRequest observationRequest = ObservationHealthRecordsRequest();
@@ -70,11 +65,12 @@ namespace CRISP.HealthRecordProxy.Controllers
             healthRecordsRequests.Add(specimenRequest);
             healthRecordsRequests.Add(imagingStudyRequest);
 
-            return await CallForResources(healthRecordsRequests);
+            var foo = await CallForResources(healthRecordsRequests);
+            return foo;
         }
 
         [HttpGet, Route("[action]")]
-        public async Task<ActionResult> GetObservationRequest()
+        public async Task<dynamic> GetObservationExample()
         {
             List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             var healthRecordsRequest = ObservationHealthRecordsRequest();
@@ -83,7 +79,7 @@ namespace CRISP.HealthRecordProxy.Controllers
         }
 
         [HttpGet, Route("[action]")]
-        public async Task<ActionResult> GetSpecimenRequest()
+        public async Task<dynamic> GetSpecimenExample()
         {
             List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             var healthRecordsRequest = SpecimenHealthRecordsRequest();
@@ -92,13 +88,15 @@ namespace CRISP.HealthRecordProxy.Controllers
         }
 
         [HttpGet, Route("[action]")]
-        public async Task<ActionResult> GetImagingStudyRequest()
+        public async Task<dynamic> GetImagingStudyExample()
         {
             List<HealthRecordsRequest> healthRecordsRequests = new List<HealthRecordsRequest>();
             var healthRecordsRequest = ImagingStudyHealthRecordsRequest();
             healthRecordsRequests.Add(healthRecordsRequest);
             return await CallForResources(healthRecordsRequests);
         }
+
+        #endregion
 
         #region ExampleRequestObjects
 
