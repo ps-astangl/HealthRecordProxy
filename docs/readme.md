@@ -14,7 +14,7 @@ output and response deltas.
 
 The for each Controller there is a `GetAllExample`  action method that will transform the input in request and process
 it. Below is an example of the a list
-of [HealthRecordRequest](src/CRISP.HealthRecordsProxy.Common/APIModels/ServiceResponse.cs) that specify the resource
+of [HealthRecordRequest](../src/CRISP.HealthRecordsProxy.Common/APIModels/ServiceResponse.cs) that specify the resource
 name and logical id's to search for.
 
 The precise way that InContext can be changed but the central idea is as follows:
@@ -365,7 +365,7 @@ specimen has the worst response time for this specific operation. The case may b
 
 As an alternative approach the databases from each microservice were scaffolded using entity framework and the mechanism
 for how the microservice performs the query was replicated throughout the implementations of the actions within
-the [Database Controller](../CRISP.HealthRecordsProxy/Controllers/DatabaseController.cs)
+the [Database Controller](../src/CRISP.HealthRecordsProxy/Controllers/DatabaseController.cs)
 
 Each action has an associated repository that follows the same pattern. It is important to note this pattern is more or
 less the same for each FHIR Database but the abstraction is deeply hidden.
